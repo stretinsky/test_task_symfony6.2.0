@@ -23,12 +23,17 @@
         #...
         ```
 
-    2. Composer install & update the schema from the container
+    2. Composer install & update the schema from the container, execute migrations
 
         ```sh
         $ docker-compose exec php-fpm bash
         $ composer install
         $ bin/console doctrine:schema:update --force
+        $ bin/console doctrine:migrations:migrate
+        ```
+    3. Generate the SSL keys
+        ```sh
+        $ bin/console lexik:jwt:generate-keypair
         ```
 
 Now we can stop our stack with `docker-compose down` and start it again with `docker-compose up -d`
