@@ -2,11 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Element;
 use App\Service\ObjService;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityNotFoundException;
 use Exception;
-use PhpParser\Node\Stmt\Return_;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -36,7 +34,7 @@ class ObjController extends AbstractController
             return new JsonResponse([
                 'error' => true,
                 'message' => $e->getMessage()
-            ]);
+            ], 400);
         }
 
         $memory = memory_get_usage() - $memory;
@@ -52,6 +50,64 @@ class ObjController extends AbstractController
             'result' => round(microtime(true) - $start, 4) . "sec. \ " . round($memory, 2) . ' ' . $name[$i],
             'id' => $id
        ]);
+    }
+
+    /**
+     * @Route("/api/obj/read", name="api_obj_read")
+     */
+    public function read(ObjService $objService, SerializerInterface $serializer)
+    {
+        $resp = new Response($serializer->serialize($objService->readObj(), 'json'));
+        $resp->headers->set('Content-Type', 'application/json');
+        return $resp;
+    }
+
+    /**
+     * @Route("/api/obj/update", name="api_obj_update")
+     */
+    public function update(ObjService $objService, Request $request)
+    {
+        $id = $request->query->get('id');
+        if ($request->getMethod() == 'GET') {
+            $jsonString = $request->query->get('json');
+        } else {
+            $jsonString = $request->getContent();
+        }
+
+        try {
+            $objService->updateObj($id, $jsonString);
+        } catch (EntityNotFoundException $e) {
+            return new JsonResponse([
+                'error' => true,
+                'message' => $e->getMessage()
+            ], $e->getCode());
+        } catch (Exception $e) {
+            return new JsonResponse([
+                'error' => true,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+        
+        return new JsonResponse(['success' => true]);
+    }
+
+    /**
+     * @Route("/api/obj/delete", name="api_obj_delete")
+     */
+    public function delete(ObjService $objService, Request $request)
+    {
+        $id = $request->query->get('id');
+
+        try {
+            $objService->deleteObj($id);
+        } catch (EntityNotFoundException $e) {
+            return new JsonResponse([
+                'error' => true,
+                'message' => $e->getMessage()
+            ], $e->getCode());
+        } 
+        
+        return new JsonResponse(['success' => true]);
     }
 
 }

@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Obj;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityNotFoundException;
 use Exception;
 
 class ObjService
@@ -28,6 +29,41 @@ class ObjService
         $this->em->flush();
 
         return $obj->getId();
+    }
+
+    public function readObj()
+    {
+        return $this->em->getRepository(Obj::class)->findAll();
+    }
+
+    public function updateObj(int $id, ?string $data)
+    {
+        $obj = $this->em->getRepository(Obj::class)->findOneBy(['id' => $id]);
+
+        if ($obj == null) {
+            throw new EntityNotFoundException('Obj not found', 404);
+        }
+
+        if (!$this->is_json($data)) {
+            throw new Exception('Invalid json string');
+        }  
+
+        $obj->setData(json_decode($data, true));
+        $this->em->flush();
+
+        return $obj->getId();
+    }
+
+    public function deleteObj(int $id)
+    {
+        $obj = $this->em->getRepository(Obj::class)->findOneBy(['id' => $id]);
+
+        if ($obj == null) {
+            throw new EntityNotFoundException('Obj not found', 404);
+        }
+
+        $this->em->remove($obj);
+        $this->em->flush();
     }
 
     private function is_json($string) {
