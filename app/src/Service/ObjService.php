@@ -36,7 +36,7 @@ class ObjService
         return $this->em->getRepository(Obj::class)->findAll();
     }
 
-    public function updateObj(int $id, ?string $data)
+    public function updateObj($id, ?string $data)
     {
         $obj = $this->em->getRepository(Obj::class)->findOneBy(['id' => $id]);
 
@@ -54,7 +54,7 @@ class ObjService
         return $obj->getId();
     }
 
-    public function deleteObj(int $id)
+    public function deleteObj($id)
     {
         $obj = $this->em->getRepository(Obj::class)->findOneBy(['id' => $id]);
 
