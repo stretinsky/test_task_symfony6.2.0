@@ -26,5 +26,10 @@ services:
         arguments:
             [ '@security.password_hasher_factory' ]
 
+    app_service.obj_service:
+        class: App\Service\ObjService
+        arguments: [ '@doctrine.orm.entity_manager' ]
+        public: true
+        
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

@@ -37,3 +37,18 @@
         ```
 
 Now we can stop our stack with `docker-compose down` and start it again with `docker-compose up -d`
+
+## Usage
+
+Once all the containers are up, our services are available at:
+
+* Symfony app: `localhost:8081`
+* Front: `localhost:8081\index.html`
+* PhpMyAdmin: `localhost:8080`
+
+Getting user authorization token from the console
+
+    ```sh
+    $ docker-compose exec php-fpm bash
+    $ bin/console app:token username password
+    ```
